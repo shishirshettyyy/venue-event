@@ -9,6 +9,7 @@ frontend/.vite/
 
 # Environment files
 backend/.env
+frontend/.env
 .env
 
 # Logs
