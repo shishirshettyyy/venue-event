@@ -8,11 +8,12 @@ const LENGTH = 6
 export default function OtpVerification() {
   const location = useLocation()
   const navigate = useNavigate()
-  const { login } = useAuth()
+  const { verifyOtp, verifyResetOtp, forgotPassword } = useAuth()
   const { showToast } = useToast()
   const { email, name, mode } = location.state || {}
-  const [digits, setDigits] = useState(Array(LENGTH).fill(''))
-  const [error, setError] = useState('')
+  const [digits, setDigits]     = useState(Array(LENGTH).fill(''))
+  const [error, setError]       = useState('')
+  const [apiError, setApiError] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const inputs = useRef([])
 
@@ -32,6 +33,7 @@ export default function OtpVerification() {
     next[i] = v
     setDigits(next)
     if (error) setError('')
+    if (apiError) setApiError('')
     if (v && i < LENGTH - 1) inputs.current[i + 1]?.focus()
   }
 
@@ -41,7 +43,7 @@ export default function OtpVerification() {
     }
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault()
     const code = digits.join('')
     if (code.length !== LENGTH) {
@@ -49,23 +51,40 @@ export default function OtpVerification() {
       return
     }
     setError('')
+    setApiError('')
     setSubmitting(true)
-    setTimeout(() => {
-      setSubmitting(false)
+
+    try {
       if (mode === 'reset') {
-        navigate('/reset-password', { state: { email } })
+        // Verify reset OTP — on success navigate to reset password form
+        await verifyResetOtp(email, code)
+        navigate('/reset-password', { state: { email, otp: code } })
       } else {
-        login({ name, email })
+        // Verify registration OTP — logs in automatically
+        await verifyOtp(email, code)
         navigate('/dashboard')
       }
-    }, 500)
+    } catch (err) {
+      setApiError(err.message || 'Invalid code. Please try again.')
+    } finally {
+      setSubmitting(false)
+    }
   }
 
-  function handleResend() {
+  async function handleResend() {
     setDigits(Array(LENGTH).fill(''))
     setError('')
+    setApiError('')
+    try {
+      if (mode === 'reset') {
+        await forgotPassword(email)
+      }
+      // For register mode, backend auto-resends when login is attempted on unverified email
+      showToast('A new code has been sent to your email')
+    } catch {
+      showToast('Could not resend — please wait a moment and try again')
+    }
     inputs.current[0]?.focus()
-    showToast('A new code has been sent')
   }
 
   return (
@@ -77,6 +96,12 @@ export default function OtpVerification() {
       </p>
 
       <form onSubmit={handleSubmit} noValidate className="auth-card mt-8 space-y-6">
+        {apiError && (
+          <div className="rounded-xl bg-accent/10 px-4 py-3 text-sm font-medium text-accent-dark text-center">
+            {apiError}
+          </div>
+        )}
+
         <div className="flex justify-center gap-2">
           {digits.map((d, i) => (
             <input
@@ -87,8 +112,8 @@ export default function OtpVerification() {
               onKeyDown={(e) => handleKeyDown(i, e)}
               inputMode="numeric"
               maxLength={1}
-              aria-invalid={!!error}
-              className={`otp-box ${error ? 'form-input-error' : ''}`}
+              aria-invalid={!!error || !!apiError}
+              className={`otp-box ${error || apiError ? 'form-input-error' : ''}`}
             />
           ))}
         </div>

@@ -1,37 +1,81 @@
-import React, { createContext, useContext, useEffect, useState } from 'react'
+import React, { createContext, useContext, useState } from 'react'
+import { api } from '../utils/api.js'
 
 const AuthContext = createContext(null)
-const STORAGE_KEY = 'venue.user'
 
-function loadUser() {
+function loadAuth() {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    return raw ? JSON.parse(raw) : null
+    return {
+      token: localStorage.getItem('venue.token'),
+      user: JSON.parse(localStorage.getItem('venue.user') || 'null'),
+    }
   } catch {
-    return null
+    return { token: null, user: null }
   }
 }
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(loadUser)
+  const initial = loadAuth()
+  const [user, setUser] = useState(initial.user)
+  const [token, setToken] = useState(initial.token)
 
-  useEffect(() => {
-    if (user) localStorage.setItem(STORAGE_KEY, JSON.stringify(user))
-    else localStorage.removeItem(STORAGE_KEY)
-  }, [user])
-
-  function login({ name, email }) {
-    const record = { name: name || email.split('@')[0], email }
-    setUser(record)
-    return record
+  // ─── Persist / clear auth ────────────────────────────────────────────────
+  function setAuth(userData, tokenData) {
+    setUser(userData)
+    setToken(tokenData)
+    if (userData && tokenData) {
+      localStorage.setItem('venue.user', JSON.stringify(userData))
+      localStorage.setItem('venue.token', tokenData)
+    } else {
+      localStorage.removeItem('venue.user')
+      localStorage.removeItem('venue.token')
+    }
   }
 
+  // ─── Register → sends OTP, does NOT log in yet ───────────────────────────
+  async function register(name, email, password, role = 'attendee') {
+    return api.post('/auth/register', { name, email, password, role })
+    // Returns { userId, message }
+  }
+
+  // ─── Verify OTP (email verification after register) ──────────────────────
+  async function verifyOtp(email, otp) {
+    const data = await api.post('/auth/verify-otp', { email, otp })
+    setAuth(data.user, data.token)
+    return data
+  }
+
+  // ─── Login ───────────────────────────────────────────────────────────────
+  async function login(email, password) {
+    const data = await api.post('/auth/login', { email, password })
+    setAuth(data.user, data.token)
+    return data
+  }
+
+  // ─── Forgot password ─────────────────────────────────────────────────────
+  async function forgotPassword(email) {
+    return api.post('/auth/forgot-password', { email })
+  }
+
+  // ─── Verify reset OTP ─────────────────────────────────────────────────────
+  async function verifyResetOtp(email, otp) {
+    return api.post('/auth/verify-reset-otp', { email, otp })
+  }
+
+  // ─── Reset password ───────────────────────────────────────────────────────
+  async function resetPassword(email, otp, newPassword) {
+    return api.post('/auth/reset-password', { email, otp, newPassword })
+  }
+
+  // ─── Logout ───────────────────────────────────────────────────────────────
   function logout() {
-    setUser(null)
+    setAuth(null, null)
   }
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider
+      value={{ user, token, login, logout, register, verifyOtp, forgotPassword, verifyResetOtp, resetPassword }}
+    >
       {children}
     </AuthContext.Provider>
   )

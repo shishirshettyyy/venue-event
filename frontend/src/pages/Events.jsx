@@ -1,16 +1,27 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { categories, states } from '../data/events.js'
+import { api } from '../utils/api.js'
 import { useEvents } from '../hooks/useEvents.js'
 import EventCard from '../components/EventCard.jsx'
 import EventCardSkeleton from '../components/EventCardSkeleton.jsx'
 
+const CATEGORIES = ['All', 'Workshop', 'Meetup', 'Show', 'Concert', 'Conference']
+
 export default function Events() {
   const [searchParams] = useSearchParams()
-  const [query, setQuery] = useState(searchParams.get('q') || '')
+  const [query, setQuery]       = useState(searchParams.get('q')        || '')
   const [category, setCategory] = useState(searchParams.get('category') || 'All')
-  const [state, setState] = useState('All')
+  const [state, setState]       = useState('All')
+  const [states, setStates]     = useState([])
+
   const { events, loading, error } = useEvents()
+
+  // Fetch city/state/category meta from API once
+  useEffect(() => {
+    api.get('/events/meta')
+      .then(data => setStates(data.states || []))
+      .catch(() => {})
+  }, [])
 
   useEffect(() => {
     setQuery(searchParams.get('q') || '')
@@ -24,7 +35,7 @@ export default function Events() {
         e.title.toLowerCase().includes(query.toLowerCase()) ||
         e.city.toLowerCase().includes(query.toLowerCase())
       const matchesCategory = category === 'All' || e.category === category
-      const matchesState = state === 'All' || e.state === state
+      const matchesState    = state === 'All'    || e.state    === state
       return matchesQuery && matchesCategory && matchesState
     })
   }, [events, query, category, state])
@@ -37,41 +48,33 @@ export default function Events() {
       {/* Search */}
       <div className="mt-6 flex items-center gap-2 rounded-full border border-line px-4 py-2.5 focus-within:border-ink">
         <span className="text-muted">⌕</span>
-        <input
-          type="text"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
+        <input type="text" value={query} onChange={(e) => setQuery(e.target.value)}
           placeholder="Search by event name or city…"
-          className="w-full text-sm outline-none placeholder:text-muted"
-        />
+          className="w-full text-sm outline-none placeholder:text-muted" />
       </div>
 
       {/* Category filters */}
       <div className="mt-5 flex flex-wrap gap-2">
-        {['All', ...categories].map((c) => (
-          <button
-            key={c}
-            onClick={() => setCategory(c)}
-            className={`chip ${category === c ? 'chip-active' : ''}`}
-          >
+        {CATEGORIES.map((c) => (
+          <button key={c} onClick={() => setCategory(c)}
+            className={`chip ${category === c ? 'chip-active' : ''}`}>
             {c}
           </button>
         ))}
       </div>
 
       {/* State filter */}
-      <div className="mt-4 flex flex-wrap items-center gap-2">
-        <span className="eyebrow mr-1">State</span>
-        {['All', ...states].map((s) => (
-          <button
-            key={s}
-            onClick={() => setState(s)}
-            className={`chip !py-1 !px-3 text-xs ${state === s ? 'chip-active' : ''}`}
-          >
-            {s}
-          </button>
-        ))}
-      </div>
+      {states.length > 0 && (
+        <div className="mt-4 flex flex-wrap items-center gap-2">
+          <span className="eyebrow mr-1">State</span>
+          {['All', ...states].map((s) => (
+            <button key={s} onClick={() => setState(s)}
+              className={`chip !py-1 !px-3 text-xs ${state === s ? 'chip-active' : ''}`}>
+              {s}
+            </button>
+          ))}
+        </div>
+      )}
 
       {!loading && !error && (
         <p className="mt-6 text-sm text-muted">
@@ -81,9 +84,7 @@ export default function Events() {
 
       {loading && (
         <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <EventCardSkeleton key={i} />
-          ))}
+          {Array.from({ length: 6 }).map((_, i) => <EventCardSkeleton key={i} />)}
         </div>
       )}
 
@@ -96,9 +97,7 @@ export default function Events() {
 
       {!loading && !error && (
         <div className="mt-4 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {filtered.map((e) => (
-            <EventCard key={e.id} event={e} />
-          ))}
+          {filtered.map((e) => <EventCard key={e.id} event={e} />)}
         </div>
       )}
 
