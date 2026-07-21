@@ -1,0 +1,181 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-ink: 30 19 48;
+    --color-base: 255 255 255;
+    --color-surface: 255 255 255;
+    --color-offset: 247 245 250;
+    --color-muted: 111 106 124;
+    --color-line: 229 225 235;
+  }
+  .dark {
+    --color-ink: 240 238 247;
+    --color-base: 17 14 26;
+    --color-surface: 26 21 38;
+    --color-offset: 32 26 47;
+    --color-muted: 165 159 181;
+    --color-line: 54 46 71;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-base text-ink font-sans antialiased transition-colors duration-200;
+  }
+  h1, h2, h3, h4 {
+    @apply font-display text-ink;
+  }
+  :focus-visible {
+    outline: 2px solid #3D1560;
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+  .dark :focus-visible {
+    outline-color: #B79CE0;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  .eyebrow {
+    @apply font-mono text-xs uppercase tracking-[0.14em] text-muted;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-bold text-white shadow-card transition hover:bg-accent-dark active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:active:scale-100;
+  }
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-full border-2 border-ink bg-surface px-6 py-3 text-sm font-bold text-ink transition hover:bg-ink hover:text-base active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:active:scale-100;
+  }
+  .chip {
+    @apply inline-flex items-center rounded-full border border-line bg-surface px-3.5 py-1.5 text-sm font-medium text-ink transition hover:border-ink;
+  }
+  .chip-active {
+    @apply border-ink bg-ink text-base;
+  }
+
+  /* Signature: image-forward event card with a folded date badge, Eventbrite-style */
+  .event-card {
+    @apply block overflow-hidden rounded-2xl border border-line bg-surface transition;
+  }
+  .event-card:hover {
+    @apply shadow-lift -translate-y-1;
+  }
+  .date-badge {
+    @apply absolute left-3 top-3 flex w-14 flex-col items-center overflow-hidden rounded-lg bg-surface shadow-card;
+  }
+  .date-badge__month {
+    @apply w-full bg-accent py-0.5 text-center font-mono text-[10px] font-bold uppercase tracking-wide text-white;
+  }
+  .date-badge__day {
+    @apply w-full py-1 text-center font-display text-lg font-bold leading-none text-ink;
+  }
+  .save-btn {
+    @apply absolute right-3 top-3 grid h-9 w-9 place-items-center rounded-full bg-surface/90 text-ink shadow-card backdrop-blur transition hover:bg-surface hover:text-accent;
+  }
+
+  .form-input {
+    @apply w-full rounded-xl border border-line bg-surface px-4 py-3 text-sm text-ink outline-none transition focus:border-ink;
+  }
+  .form-input-error {
+    @apply border-accent-dark focus:border-accent-dark;
+  }
+  .form-error {
+    @apply mt-1.5 text-xs font-medium text-accent-dark;
+  }
+  .form-label {
+    @apply text-sm font-semibold text-ink;
+  }
+  .auth-card {
+    @apply mx-auto w-full max-w-md rounded-2xl border border-line bg-surface p-8 shadow-card;
+  }
+  .otp-box {
+    @apply h-14 w-12 rounded-xl border border-line bg-surface text-center font-display text-xl font-bold text-ink outline-none focus:border-ink sm:w-14;
+  }
+
+  /* Loading skeletons */
+  .skeleton {
+    @apply relative overflow-hidden bg-line/60;
+  }
+  .skeleton::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(90deg, transparent, rgb(var(--color-surface) / 0.5), transparent);
+    animation: shimmer 1.6s infinite;
+  }
+  @keyframes shimmer {
+    100% {
+      transform: translateX(100%);
+    }
+  }
+  .spinner {
+    @apply inline-block h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white;
+  }
+
+  /* Ticket stub — reserved for the actual ticket / confirmation views */
+  .ticket {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr;
+    background: theme('colors.surface');
+    border: 1px solid theme('colors.line');
+    border-radius: 14px;
+    overflow: visible;
+  }
+  @screen sm {
+    .ticket {
+      grid-template-columns: 1fr auto;
+    }
+  }
+  .ticket-divider {
+    position: relative;
+    border-top: 1.5px dashed theme('colors.line');
+  }
+  @screen sm {
+    .ticket-divider {
+      border-top: none;
+      border-left: 1.5px dashed theme('colors.line');
+    }
+  }
+  .ticket-notch {
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    background: theme('colors.base');
+    border-radius: 9999px;
+    border: 1px solid theme('colors.line');
+  }
+  .ticket-notch--top {
+    top: -9px;
+    left: -9px;
+  }
+  .ticket-notch--bottom {
+    bottom: -9px;
+    left: -9px;
+  }
+  @screen sm {
+    .ticket-notch--top {
+      top: -9px;
+      left: -9px;
+    }
+    .ticket-notch--bottom {
+      top: -9px;
+      bottom: auto;
+      left: auto;
+      right: -9px;
+    }
+  }
+}
