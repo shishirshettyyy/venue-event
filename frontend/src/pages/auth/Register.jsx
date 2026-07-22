@@ -37,14 +37,15 @@ export default function Register() {
     setSubmitting(true)
     try {
       await register(name, email, password, role)
-      // Registration successful — OTP was sent, navigate to verify
-      navigate('/verify-otp', { state: { email, name, mode: 'register' } })
+      // Registration successful — account is active, go to dashboard
+      navigate('/dashboard')
     } catch (err) {
       setApiError(err.message || 'Registration failed. Please try again.')
     } finally {
       setSubmitting(false)
     }
   }
+
 
   return (
     <div className="mx-auto max-w-md px-5 py-16 sm:px-8">

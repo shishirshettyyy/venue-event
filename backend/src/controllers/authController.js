@@ -14,29 +14,23 @@ async function register(req, res, next) {
     }
 
     const passwordHash = await User.hashPassword(password)
-    const { otp, expiresAt } = generateOtp()
 
     const user = await User.create({
       name,
       email,
       passwordHash,
       role: role === 'organizer' ? 'organizer' : 'attendee',
-      otp,
-      otpExpiresAt: expiresAt,
+      isVerified: true,   // auto-verify — no OTP required
     })
 
-    await sendOtpEmail(email, otp, 'Verify your Venue account')
-
-    res.status(201).json({
-      message: 'Registration successful. Check your email for the OTP.',
-      userId: user._id,
-    })
+    const token = generateToken(user)
+    res.status(201).json({ message: 'Registration successful.', token, user })
   } catch (err) {
     next(err)
   }
 }
 
-// ─── Verify OTP (email verification) ─────────────────────────────────────────
+// ─── Verify OTP (email verification) — kept for backward compat but not used ──
 async function verifyOtp(req, res, next) {
   try {
     const { email, otp } = req.body
@@ -82,17 +76,10 @@ async function login(req, res, next) {
       return res.status(401).json({ message: 'Invalid email or password' })
     }
 
+    // Auto-verify any legacy unverified accounts on first successful login
     if (!user.isVerified) {
-      // Re-send OTP so the user can complete verification
-      const { otp, expiresAt } = generateOtp()
-      user.otp = otp
-      user.otpExpiresAt = expiresAt
+      user.isVerified = true
       await user.save()
-      await sendOtpEmail(email, otp, 'Verify your Venue account')
-      return res.status(403).json({
-        message: 'Email not verified. A new OTP has been sent.',
-        requiresVerification: true,
-      })
     }
 
     const token = generateToken(user)
@@ -101,6 +88,7 @@ async function login(req, res, next) {
     next(err)
   }
 }
+
 
 // ─── Forgot password — send reset OTP ────────────────────────────────────────
 async function forgotPassword(req, res, next) {

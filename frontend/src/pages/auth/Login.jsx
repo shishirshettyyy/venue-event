@@ -32,16 +32,12 @@ export default function Login() {
       await login(email, password)
       navigate('/dashboard')
     } catch (err) {
-      if (err.status === 403 && err.data?.requiresVerification) {
-        // Not verified → send to OTP
-        navigate('/verify-otp', { state: { email, mode: 'register' } })
-      } else {
-        setApiError(err.message || 'Login failed. Please try again.')
-      }
+      setApiError(err.message || 'Login failed. Please try again.')
     } finally {
       setSubmitting(false)
     }
   }
+
 
   return (
     <div className="mx-auto max-w-md px-5 py-16 sm:px-8">

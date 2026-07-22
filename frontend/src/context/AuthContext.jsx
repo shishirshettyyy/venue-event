@@ -32,11 +32,13 @@ export function AuthProvider({ children }) {
     }
   }
 
-  // ─── Register → sends OTP, does NOT log in yet ───────────────────────────
+  // ─── Register → creates account, logs in immediately ────────────────────────
   async function register(name, email, password, role = 'attendee') {
-    return api.post('/auth/register', { name, email, password, role })
-    // Returns { userId, message }
+    const data = await api.post('/auth/register', { name, email, password, role })
+    setAuth(data.user, data.token)
+    return data
   }
+
 
   // ─── Verify OTP (email verification after register) ──────────────────────
   async function verifyOtp(email, otp) {

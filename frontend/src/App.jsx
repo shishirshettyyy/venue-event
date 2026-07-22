@@ -23,8 +23,7 @@ import NotFound from './pages/NotFound.jsx'
 import Login from './pages/auth/Login.jsx'
 import Register from './pages/auth/Register.jsx'
 import ForgotPassword from './pages/auth/ForgotPassword.jsx'
-import OtpVerification from './pages/auth/OtpVerification.jsx'
-import ResetPassword from './pages/auth/ResetPassword.jsx'
+
 
 export default function App() {
   return (
@@ -54,8 +53,7 @@ export default function App() {
                       <Route path="/login" element={<Login />} />
                       <Route path="/register" element={<Register />} />
                       <Route path="/forgot-password" element={<ForgotPassword />} />
-                      <Route path="/verify-otp" element={<OtpVerification />} />
-                      <Route path="/reset-password" element={<ResetPassword />} />
+
                       <Route path="*" element={<NotFound />} />
                     </Routes>
                   </main>
