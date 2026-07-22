@@ -5,6 +5,7 @@ import { useTheme } from '../context/ThemeContext.jsx'
 
 const links = [
   { to: '/dashboard', label: 'Dashboard' },
+  { to: '/organizer', label: 'Organizer' },
   { to: '/contact', label: 'Contact' },
   { to: '/team', label: 'About us' },
 ]
@@ -85,14 +86,21 @@ export default function Navbar() {
                 {user.name?.[0]?.toUpperCase() || 'U'}
               </button>
               {menuOpen && (
-                <div className="absolute right-0 mt-2 w-44 rounded-xl border border-line bg-surface p-2 shadow-lift">
+                <div className="absolute right-0 mt-2 w-48 rounded-xl border border-line bg-surface p-2 shadow-lift">
                   <p className="truncate px-3 py-1.5 text-xs text-muted">{user.email}</p>
                   <NavLink
                     to="/dashboard"
                     onClick={() => setMenuOpen(false)}
                     className="block rounded-lg px-3 py-2 text-sm font-medium text-ink hover:bg-offset"
                   >
-                    Dashboard
+                    My Bookings
+                  </NavLink>
+                  <NavLink
+                    to="/organizer"
+                    onClick={() => setMenuOpen(false)}
+                    className="block rounded-lg px-3 py-2 text-sm font-medium text-ink hover:bg-offset"
+                  >
+                    Organizer Dashboard
                   </NavLink>
                   <button
                     onClick={handleLogout}

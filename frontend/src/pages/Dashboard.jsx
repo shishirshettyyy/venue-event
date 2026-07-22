@@ -78,10 +78,20 @@ export default function Dashboard() {
 
   return (
     <div className="mx-auto max-w-6xl px-5 py-12 sm:px-8">
-      <p className="eyebrow">Your dashboard</p>
-      <h1 className="mt-2 text-3xl font-bold sm:text-4xl">
-        Welcome{user ? `, ${user.name}` : ''}
-      </h1>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p className="eyebrow">Your dashboard</p>
+          <h1 className="mt-1 text-3xl font-bold sm:text-4xl">
+            Welcome{user ? `, ${user.name}` : ''}
+          </h1>
+        </div>
+        <Link
+          to="/organizer"
+          className="btn-primary !py-2.5 !px-5 text-sm font-semibold self-start sm:self-auto shadow-card"
+        >
+          🎪 Host &amp; Manage Events →
+        </Link>
+      </div>
 
       {!user && (
         <div className="mt-4 flex flex-wrap items-center gap-3 rounded-2xl border border-line bg-offset px-5 py-4 text-sm">

@@ -16,6 +16,7 @@ import Booking from './pages/Booking.jsx'
 import Payment from './pages/Payment.jsx'
 import Confirmation from './pages/Confirmation.jsx'
 import Dashboard from './pages/Dashboard.jsx'
+import OrganizerDashboard from './pages/OrganizerDashboard.jsx'
 import Team from './pages/Team.jsx'
 import Contact from './pages/Contact.jsx'
 import NotFound from './pages/NotFound.jsx'
@@ -46,6 +47,8 @@ export default function App() {
                       <Route path="/bookings" element={<Navigate to="/dashboard" replace />} />
                       <Route path="/bookings/:bookingId/confirmation" element={<Confirmation />} />
                       <Route path="/dashboard" element={<Dashboard />} />
+                      <Route path="/organizer" element={<OrganizerDashboard />} />
+                      <Route path="/organizer/dashboard" element={<OrganizerDashboard />} />
                       <Route path="/team" element={<Team />} />
                       <Route path="/contact" element={<Contact />} />
                       <Route path="/login" element={<Login />} />
