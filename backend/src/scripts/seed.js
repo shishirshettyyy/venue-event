@@ -189,27 +189,39 @@ const seedEvents = async (organizer) => {
 const seedTeam = async () => {
   const members = [
     {
-      name: 'Rahul Mehta',
-      role: 'Product & User Experience',
-      bio: 'Designs the event discovery flow and the component system.',
+      name: 'Shishir N Shetty',
+      role: 'Backend Developer',
+      bio: 'Builds the REST API, database models, and server-side logic that powers the entire platform.',
       photo: '',
-      links: { github: 'https://github.com', linkedin: 'https://linkedin.com', portfolio: '' },
+      links: {
+        github: 'https://github.com/shishirshettyyy',
+        linkedin: 'https://www.linkedin.com/in/shishirshettyy/',
+        portfolio: '',
+      },
       order: 1,
     },
     {
-      name: 'Sneha Iyer',
-      role: 'Backend & Database',
-      bio: 'Builds the API, seat-inventory logic, and keeps the data consistent.',
+      name: 'Prachi Meena',
+      role: 'Frontend Developer',
+      bio: 'Crafts the user interface and interactive components that bring the event experience to life.',
       photo: '',
-      links: { github: 'https://github.com', linkedin: 'https://linkedin.com', portfolio: '' },
+      links: {
+        github: 'https://github.com/Prachi20meena',
+        linkedin: 'https://www.linkedin.com/in/prachi-meena-110475380',
+        portfolio: '',
+      },
       order: 2,
     },
     {
-      name: 'Kiran Rao',
-      role: 'Operations & Organizer Tools',
-      bio: 'Owns the organizer dashboard and event publishing workflows.',
+      name: 'Jai Asmitha B M',
+      role: 'Frontend Developer',
+      bio: 'Shapes the visual design and responsive layouts that make every page feel polished and intuitive.',
       photo: '',
-      links: { github: 'https://github.com', linkedin: 'https://linkedin.com', portfolio: '' },
+      links: {
+        github: 'https://github.com/bmjaiasmitha-glitch',
+        linkedin: 'https://www.linkedin.com/in/jai-asmitha-b-m-a1b2aa3a5',
+        portfolio: '',
+      },
       order: 3,
     },
   ]
