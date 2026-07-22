@@ -14,9 +14,22 @@ const teamRoutes = require('./routes/teamRoutes')
 const app = express()
 
 // ─── CORS ──────────────────────────────────────────────────────────────────────
+// Trim any trailing slash from CLIENT_URL so exact-match always works
+const ALLOWED_ORIGIN = (process.env.CLIENT_URL || 'http://localhost:5173').replace(/\/$/, '')
+
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || 'http://localhost:5173',
+    origin(origin, callback) {
+      // Allow server-to-server / curl requests (no origin header)
+      if (!origin) return callback(null, true)
+      // Strip trailing slash from incoming origin just in case
+      const clean = origin.replace(/\/$/, '')
+      // Allow the configured production URL
+      if (clean === ALLOWED_ORIGIN) return callback(null, true)
+      // Allow any localhost port for local development
+      if (/^http:\/\/localhost(:\d+)?$/.test(clean)) return callback(null, true)
+      callback(new Error(`CORS: origin ${origin} not allowed`))
+    },
     credentials: true,
   })
 )
